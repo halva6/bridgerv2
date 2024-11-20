@@ -56,5 +56,5 @@
         "temp/": true,
         "Temp/": true
     },
-    "dotnet.defaultSolution": "BridgerV2.sln"
+    "dotnet.defaultSolution": "bridgerv2.sln"
 }
