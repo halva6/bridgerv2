@@ -2,11 +2,9 @@ using UnityEngine;
 
 public class CameraMovement : MonoBehaviour
 {
-    public float zoomSpeed = 5f; // Geschwindigkeit des Zooms
-    public float minZoom = 2f;  // Minimaler Zoom (näher ran)
-    public float maxZoom = 10f; // Maximaler Zoom (weiter weg)
-    public float moveSpeed = 0.5f; // Geschwindigkeit der Kamerabewegung
-
+    [SerializeField] private float zoomSpeed = 5f; // Geschwindigkeit des Zooms
+    [SerializeField] private float minZoom = 2f;  // Minimaler Zoom (näher ran)
+    [SerializeField] private float maxZoom = 10f; // Maximaler Zoom (weiter weg)
     private Vector3 dragOrigin; // Startpunkt für das Ziehen
 
     void Update()

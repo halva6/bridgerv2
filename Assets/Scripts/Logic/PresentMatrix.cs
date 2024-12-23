@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using Unity.Collections;
 using UnityEngine;
 
 public class PresentMatrix : MonoBehaviour
@@ -11,32 +13,18 @@ public class PresentMatrix : MonoBehaviour
     [SerializeField] private GameObject wall;
 
     // Die Matrix
-    private int[,] matrix = new int[,]
-    {
-        { -1,  1, -1,  1, -1,  1, -1,  1, -1,  1, -1 },
-        {  2,  0,  2,  0,  2,  0,  2,  3,  2,  0,  2 },
-        { -1,  1,  0,  1,  0,  1,  0,  1,  0,  1, -1 },
-        {  2,  4,  2,  3,  2,  0,  2,  0,  2,  0,  2 },
-        { -1,  1,  0,  1,  0,  1,  0,  1,  0,  1, -1 },
-        {  2,  0,  2,  0,  2,  0,  2,  0,  2,  0,  2 },
-        { -1,  1,  0,  1,  4,  1,  0,  1,  0,  1, -1 },
-        {  2,  0,  2,  0,  2,  0,  2,  0,  2,  0,  2 },
-        { -1,  1,  0,  1,  0,  1,  0,  1,  0,  1, -1 },
-        {  2,  0,  2,  0,  2,  0,  2,  4,  2,  0,  2 },
-        { -1,  1,  0,  1,  0,  1,  0,  1,  0,  1, -1 },
-        {  2,  0,  2,  0,  2,  0,  2,  0,  2,  0,  2 },
-        { -1,  1, -1,  1, -1,  1, -1,  1, -1,  1, -1 }
-    };
+    private int[,] matrix;
 
-        public float cellSize = 1.0f;
+    public float cellSize = 1.0f;
 
     void Start()
     {
-        SpawnMatrix();
+        matrix = gameObject.GetComponent<Matrix>().getMatrix();
+        SpawnMatrix(this.matrix);
     }
 
-    void SpawnMatrix()
-    {   
+    void SpawnMatrix(int[,] matrix)
+    {
         int rows = matrix.GetLength(0);
         int cols = matrix.GetLength(1);
 
@@ -65,10 +53,12 @@ public class PresentMatrix : MonoBehaviour
 
                     case 1:
                         toSpawn = Instantiate(greenPier, position, Quaternion.identity);
+                        addData(toSpawn, row, col, "GreenPier");
                         break;
 
                     case 2:
                         toSpawn = Instantiate(redPier, position, Quaternion.identity);
+                        addData(toSpawn, row, col, "RedPier");
                         break;
 
                     case 3:
@@ -90,6 +80,13 @@ public class PresentMatrix : MonoBehaviour
         }
     }
 
+    void addData(GameObject toSpawn, int col, int row, string type)
+    {
+        ObjectData data = toSpawn.AddComponent<ObjectData>();
+        data.X = col;
+        data.Y = row;
+        data.Type = type;
+    }
     /// <summary>
     /// Prüft, ob das GameObject gedreht werden soll.
     /// </summary>
@@ -97,6 +94,8 @@ public class PresentMatrix : MonoBehaviour
     /// <param name="col">Die Spalte der aktuellen Zelle.</param>
     /// <param name="target">Der Zielwert, z. B. 1 oder 2.</param>
     /// <returns>True, wenn die Rotation erfolgen soll.</returns>
+    /// 
+
     bool ShouldRotate(int row, int col, int target)
     {
         bool rotate = false;

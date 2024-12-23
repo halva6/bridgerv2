@@ -366,7 +366,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1055742624}
+  - component: {fileID: 1055742625}
   - component: {fileID: 1055742623}
+  - component: {fileID: 1055742626}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -407,6 +409,34 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1055742625
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1055742622}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9d360e6b5ca6f4878898296b5e325f8f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &1055742626
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1055742622}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e78b1def2f30ca5f89cba8d89e67a1fd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  tempBridgePrefab: {fileID: 8975710170332972165, guid: f87e628db9cda4abaa28dea217b6a10f, type: 3}
+  greenBridgePrefab: {fileID: 2294943549365909288, guid: 32e18934c329bc42196f18d97fba1c40, type: 3}
+  redBridgePrefab: {fileID: 6595218311941121833, guid: 7cc04f75bd0997b84af7cc5160fd2567, type: 3}
+  cellSize: 1
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
