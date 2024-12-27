@@ -70,7 +70,7 @@ public class MatrixLogic : MonoBehaviour
                         return true;
                     }
                 }
-            }
+            } 
         }
         return false;
     }
