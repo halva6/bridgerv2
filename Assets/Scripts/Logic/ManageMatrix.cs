@@ -1,9 +1,5 @@
 using System;
-using System.Collections.Generic;
-using Unity.Collections;
-using Unity.VisualScripting;
 using UnityEngine;
-
 
 public class ManageMatrix : MonoBehaviour
 {
@@ -14,25 +10,31 @@ public class ManageMatrix : MonoBehaviour
     private int[,] matrix;
     private string type;
 
-
-    public void setBridge(int x, int y, string type, Quaternion rotation, Vector3 position)
+    public void SetBridge(int x, int y, string type, Quaternion rotation, Vector3 position)
     {
-        removeTempBridge(matrix);
-        //Debug.Log(type);
+        RemoveTempBridges();
+        Debug.Log($"Setting bridge at ({x}, {y}) with type: {type}");
+
+        GameObject newObject = null;
+
         if (type.Equals("RedPier"))
         {
-            GameObject newObject = Instantiate(redBridgePrefab, position, rotation);
-            matrix[x, y] = 4;
-
+            newObject = Instantiate(redBridgePrefab, position, rotation);
+            matrix[x, y] = 4; // Red Bridge
         }
         else if (type.Equals("GreenPier"))
         {
-            GameObject newObject = Instantiate(greenBridgePrefab, position, rotation);
-            matrix[x, y] = 3;
+            newObject = Instantiate(greenBridgePrefab, position, rotation);
+            matrix[x, y] = 3; // Green Bridge
         }
 
-        gameObject.GetComponent<Matrix>().setMatrix(matrix);
-        PrintMatrix(gameObject.GetComponent<Matrix>().getMatrix());
+        if (newObject != null)
+        {
+            newObject.transform.parent = this.transform;
+        }
+
+        UpdateMatrix(matrix);
+        PrintMatrix(matrix);
     }
 
     public void CheckAndPlace(int x, int y, string type)
@@ -40,9 +42,9 @@ public class ManageMatrix : MonoBehaviour
         this.type = type;
         matrix = gameObject.GetComponent<Matrix>().getMatrix();
         PrintMatrix(matrix);
-        removeTempBridge(matrix);
+        RemoveTempBridges();
 
-        // Überprüfe die Positionen oben, unten, links, rechts
+        // Überprüfen und Platzieren für oben, unten, links, rechts
         TryPlaceAt(x, y - 1, "o"); // Oben
         TryPlaceAt(x, y + 1, "u"); // Unten
         TryPlaceAt(x - 1, y, "l"); // Links
@@ -51,81 +53,76 @@ public class ManageMatrix : MonoBehaviour
 
     private void TryPlaceAt(int x, int y, string direction)
     {
-
         // Überprüfen, ob die Position innerhalb der Matrix liegt
-        if (x < 0 || y < 0 || x >= matrix.GetLength(1) || y >= matrix.GetLength(0)) return;
+        if (x < 0 || y < 0 || x >= matrix.GetLength(0) || y >= matrix.GetLength(1)) return;
 
         // Nur weiter machen, wenn die Matrix an der Stelle 0 ist
         if (matrix[x, y] == 0)
         {
             // Position für das neue GameObject berechnen
-            float offsetX = -matrix.GetLength(1) * cellSize / 2 + cellSize / 2;
-            float offsetY = matrix.GetLength(0) * cellSize / 2 - cellSize / 2;
+            float offsetX = -matrix.GetLength(0) * cellSize / 2 + cellSize / 2;
+            float offsetY = matrix.GetLength(1) * cellSize / 2 - cellSize / 2;
             Vector3 position = new Vector3(x * cellSize + offsetX, -y * cellSize + offsetY, 0);
 
-            // Standard-Rotation
+            // Rotation basierend auf Richtung setzen
             Quaternion rotation = Quaternion.identity;
-
-            // Drehe das Objekt, wenn es oben oder unten platziert wird
-            if (direction.Equals("o") || direction.Equals("u"))
+            if (direction == "o" || direction == "u") // Oben oder Unten
             {
                 rotation = Quaternion.Euler(0, 0, 90);
             }
 
-            // Neues GameObject instanziieren
-            GameObject newObject = Instantiate(tempBridgePrefab, position, rotation);
-            newObject.transform.parent = this.transform;
+            // Temporäres Objekt instanziieren
+            GameObject tempObject = Instantiate(tempBridgePrefab, position, rotation);
+            tempObject.transform.parent = this.transform;
 
-            TempBridge tb = newObject.AddComponent<TempBridge>();
-            tb.Type = this.type;
-            tb.Rotaion = rotation;
-            tb.Position = position;
-            tb.X = x;
-            tb.Y = y;
-
+            // Daten dem temporären Objekt hinzufügen
+            ObjectDataTempBridge tempData = tempObject.AddComponent<ObjectDataTempBridge>();
+            tempData.Type = this.type;
+            tempData.Rotation = rotation;
+            tempData.Position = position;
+            tempData.X = x;
+            tempData.Y = y;
 
             // Matrix aktualisieren
-            matrix[x, y] = 5;
+            matrix[x, y] = 5; // Temporäre Brücke markieren
         }
     }
 
-    void removeTempBridge(int[,] matrix)
+    private void RemoveTempBridges()
     {
-        GameObject[] tempBridge = GameObject.FindGameObjectsWithTag("Temp");
-
-        foreach (GameObject gb in tempBridge)
+        // Alle temporären Brücken entfernen
+        foreach (GameObject temp in GameObject.FindGameObjectsWithTag("Temp"))
         {
-            Destroy(gb);
+            Destroy(temp);
         }
 
-        for (int i = 0; i < matrix.GetLength(0); i++)
+        // Temporäre Brücken in der Matrix zurücksetzen
+        for (int x = 0; x < matrix.GetLength(0); x++)
         {
-            for (int j = 0; j < matrix.GetLength(1); j++)
+            for (int y = 0; y < matrix.GetLength(1); y++)
             {
-                if (matrix[i, j] == 5)
+                if (matrix[x, y] == 5) // Temporäre Brücken
                 {
-                    matrix[i, j] = 0;
+                    matrix[x, y] = 0; // Zurücksetzen
                 }
             }
         }
+    }
+
+    private void UpdateMatrix(int[,] updatedMatrix)
+    {
+        gameObject.GetComponent<Matrix>().setMatrix(updatedMatrix);
     }
 
     public static void PrintMatrix(int[,] matrix)
     {
         string output = "";
 
-        for (int i = 0; i < matrix.GetLength(0); i++)
+        for (int x = 0; x < matrix.GetLength(0); x++)
         {
-            for (int j = 0; j < matrix.GetLength(1); j++)
+            for (int y = 0; y < matrix.GetLength(1); y++)
             {
-                if (matrix[i, j] == -1)
-                {
-                    output += "-";
-                }
-                else
-                {
-                    output += matrix[i, j];
-                }
+                output += matrix[x, y] == -1 ? "-" : matrix[x, y].ToString();
             }
             output += "\n";
         }

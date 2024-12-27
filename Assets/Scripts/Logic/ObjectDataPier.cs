@@ -1,20 +1,22 @@
+using Unity.Collections;
 using UnityEngine;
 
-public class TempBridge : MonoBehaviour
+public class ObjectDataPier : MonoBehaviour
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is create
     private int x;
     private int y;
+
     private string type;
-    private Quaternion rotaion;
-    private Vector3 position;
+
     public int X { get => x; set => x = value; }
     public int Y { get => y; set => y = value; }
     public string Type { get => type; set => type = value; }
-    public Quaternion Rotaion { get => rotaion; set => rotaion = value; }
-    public Vector3 Position { get => position; set => position = value; }
 
-    // Update is called once per frame
+    void Start()
+    {
+        //Debug.Log("Gameobject: " + type + " Pos: " + X.ToString() + ";" + Y.ToString());
+    }
+
     void Update()
     {
         // Überprüfen, ob die linke Maustaste gedrückt wurde
@@ -42,8 +44,9 @@ public class TempBridge : MonoBehaviour
         {
             if (hit.collider.gameObject == this.gameObject)
             {
+                //Debug.Log("Click: " + type + " Pos: " + X.ToString() + ";" + Y.ToString());
                 ManageMatrix mm = GetComponentInParent<ManageMatrix>();
-                mm?.setBridge(x, y, type, rotaion, position);
+                mm?.CheckAndPlace(X,Y, type);
             }
         }
     }

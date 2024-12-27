@@ -15,16 +15,11 @@ public class PresentMatrix : MonoBehaviour
     // Die Matrix
     private int[,] matrix;
 
-    public float cellSize = 1.0f;
+    [SerializeField] private float cellSize = 1.0f;
 
-    void Start()
+    public void SpawnMatrix(int[,] matrix)
     {
-        matrix = gameObject.GetComponent<Matrix>().getMatrix();
-        SpawnMatrix(this.matrix);
-    }
-
-    void SpawnMatrix(int[,] matrix)
-    {
+        this.matrix = matrix;
         int rows = matrix.GetLength(0);
         int cols = matrix.GetLength(1);
 
@@ -80,9 +75,9 @@ public class PresentMatrix : MonoBehaviour
         }
     }
 
-    void addData(GameObject toSpawn, int col, int row, string type)
+    void addData(GameObject toSpawn, int row, int col, string type)
     {
-        ObjectData data = toSpawn.AddComponent<ObjectData>();
+        ObjectDataPier data = toSpawn.AddComponent<ObjectDataPier>();
         data.X = row;
         data.Y = col;
         data.Type = type;

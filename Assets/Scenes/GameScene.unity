@@ -272,7 +272,6 @@ MonoBehaviour:
   zoomSpeed: 5
   minZoom: 2
   maxZoom: 12
-  moveSpeed: 0.5
 --- !u!1 &619394800
 GameObject:
   m_ObjectHideFlags: 0
@@ -367,6 +366,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1055742624}
   - component: {fileID: 1055742625}
+  - component: {fileID: 1055742627}
   - component: {fileID: 1055742623}
   - component: {fileID: 1055742626}
   m_Layer: 0
@@ -437,6 +437,18 @@ MonoBehaviour:
   greenBridgePrefab: {fileID: 2294943549365909288, guid: 32e18934c329bc42196f18d97fba1c40, type: 3}
   redBridgePrefab: {fileID: 6595218311941121833, guid: 7cc04f75bd0997b84af7cc5160fd2567, type: 3}
   cellSize: 1
+--- !u!114 &1055742627
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1055742622}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1280fc07522434aad9c06b903736d40b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
