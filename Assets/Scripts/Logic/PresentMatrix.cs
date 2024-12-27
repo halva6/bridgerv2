@@ -83,18 +83,10 @@ public class PresentMatrix : MonoBehaviour
     void addData(GameObject toSpawn, int col, int row, string type)
     {
         ObjectData data = toSpawn.AddComponent<ObjectData>();
-        data.X = col;
-        data.Y = row;
+        data.X = row;
+        data.Y = col;
         data.Type = type;
     }
-    /// <summary>
-    /// Prüft, ob das GameObject gedreht werden soll.
-    /// </summary>
-    /// <param name="row">Die Zeile der aktuellen Zelle.</param>
-    /// <param name="col">Die Spalte der aktuellen Zelle.</param>
-    /// <param name="target">Der Zielwert, z. B. 1 oder 2.</param>
-    /// <returns>True, wenn die Rotation erfolgen soll.</returns>
-    /// 
 
     bool ShouldRotate(int row, int col, int target)
     {
