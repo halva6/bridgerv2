@@ -20,12 +20,12 @@ public class ManageMatrix : MonoBehaviour
         if (type.Equals("RedPier"))
         {
             newObject = Instantiate(redBridgePrefab, position, rotation);
-            matrix[x, y] = 4; // Red Bridge
+            matrix[y, x] = 4; // Red Bridge
         }
         else if (type.Equals("GreenPier"))
         {
             newObject = Instantiate(greenBridgePrefab, position, rotation);
-            matrix[x, y] = 3; // Green Bridge
+            matrix[y, x] = 3; // Green Bridge
         }
 
         if (newObject != null)
@@ -54,14 +54,14 @@ public class ManageMatrix : MonoBehaviour
     private void TryPlaceAt(int x, int y, string direction)
     {
         // Überprüfen, ob die Position innerhalb der Matrix liegt
-        if (x < 0 || y < 0 || x >= matrix.GetLength(0) || y >= matrix.GetLength(1)) return;
+        if (y < 0 || x < 0 || y >= matrix.GetLength(0) || x >= matrix.GetLength(1)) return;
 
         // Nur weiter machen, wenn die Matrix an der Stelle 0 ist
-        if (matrix[x, y] == 0)
+        if (matrix[y, x] == 0)
         {
             // Position für das neue GameObject berechnen
-            float offsetX = -matrix.GetLength(0) * cellSize / 2 + cellSize / 2;
-            float offsetY = matrix.GetLength(1) * cellSize / 2 - cellSize / 2;
+            float offsetX = -matrix.GetLength(1) * cellSize / 2 + cellSize / 2;
+            float offsetY = matrix.GetLength(0) * cellSize / 2 - cellSize / 2;
             Vector3 position = new Vector3(x * cellSize + offsetX, -y * cellSize + offsetY, 0);
 
             // Rotation basierend auf Richtung setzen
@@ -84,7 +84,7 @@ public class ManageMatrix : MonoBehaviour
             tempData.Y = y;
 
             // Matrix aktualisieren
-            matrix[x, y] = 5; // Temporäre Brücke markieren
+            matrix[y, x] = 5; // Temporäre Brücke markieren
         }
     }
 
@@ -97,13 +97,13 @@ public class ManageMatrix : MonoBehaviour
         }
 
         // Temporäre Brücken in der Matrix zurücksetzen
-        for (int x = 0; x < matrix.GetLength(0); x++)
+        for (int y = 0; y < matrix.GetLength(0); y++)
         {
-            for (int y = 0; y < matrix.GetLength(1); y++)
+            for (int x = 0; x < matrix.GetLength(1); x++)
             {
-                if (matrix[x, y] == 5) // Temporäre Brücken
+                if (matrix[y, x] == 5) // Temporäre Brücken
                 {
-                    matrix[x, y] = 0; // Zurücksetzen
+                    matrix[y, x] = 0; // Zurücksetzen
                 }
             }
         }
@@ -118,11 +118,11 @@ public class ManageMatrix : MonoBehaviour
     {
         string output = "";
 
-        for (int x = 0; x < matrix.GetLength(0); x++)
+        for (int y = 0; y < matrix.GetLength(0); y++)
         {
-            for (int y = 0; y < matrix.GetLength(1); y++)
+            for (int x = 0; x < matrix.GetLength(1); x++)
             {
-                output += matrix[x, y] == -1 ? "-" : matrix[x, y].ToString();
+                output += matrix[y, x] == -1 ? "-" : matrix[y, x].ToString();
             }
             output += "\n";
         }

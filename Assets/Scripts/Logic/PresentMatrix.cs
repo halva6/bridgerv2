@@ -27,9 +27,9 @@ public class PresentMatrix : MonoBehaviour
         float offsetX = -cols * cellSize / 2 + cellSize / 2;
         float offsetY = rows * cellSize / 2 - cellSize / 2;
 
-        for (int row = 0; row < matrix.GetLength(0); row++)
+        for (int row = 0; row < rows; row++)
         {
-            for (int col = 0; col < matrix.GetLength(1); col++)
+            for (int col = 0; col < cols; col++)
             {
                 int value = matrix[row, col];
                 Vector3 position = new Vector3(col * cellSize + offsetX, -row * cellSize + offsetY, 0);
@@ -40,7 +40,7 @@ public class PresentMatrix : MonoBehaviour
                 {
                     case -1:
                         toSpawn = Instantiate(wall, position, Quaternion.identity);
-                        if (col == 0 || col == matrix.GetLength(1) - 1)
+                        if (col == 0 || col == cols - 1)
                         {
                             toSpawn.transform.rotation = Quaternion.Euler(0, 0, 90);
                         }
@@ -48,12 +48,12 @@ public class PresentMatrix : MonoBehaviour
 
                     case 1:
                         toSpawn = Instantiate(greenPier, position, Quaternion.identity);
-                        addData(toSpawn, row, col, "GreenPier");
+                        addData(toSpawn, col, row, "GreenPier");
                         break;
 
                     case 2:
                         toSpawn = Instantiate(redPier, position, Quaternion.identity);
-                        addData(toSpawn, row, col, "RedPier");
+                        addData(toSpawn, col, row, "RedPier");
                         break;
 
                     case 3:
@@ -75,11 +75,11 @@ public class PresentMatrix : MonoBehaviour
         }
     }
 
-    void addData(GameObject toSpawn, int row, int col, string type)
+    void addData(GameObject toSpawn, int col, int row, string type)
     {
         ObjectDataPier data = toSpawn.AddComponent<ObjectDataPier>();
-        data.X = row;
-        data.Y = col;
+        data.X = col;
+        data.Y = row;
         data.Type = type;
     }
 
