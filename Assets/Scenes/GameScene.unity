@@ -450,7 +450,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1280fc07522434aad9c06b903736d40b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  multiplayer: 0
+  multiplayer: 1
 --- !u!114 &1055742628
 MonoBehaviour:
   m_ObjectHideFlags: 0

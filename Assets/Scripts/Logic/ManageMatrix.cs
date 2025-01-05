@@ -10,6 +10,13 @@ public class ManageMatrix : MonoBehaviour
     private int[,] matrix;
     private string type;
 
+    private string currentPlayerType;
+
+    private bool isSetBridge = false;
+
+    public bool IsSetBridge { get => isSetBridge; set => isSetBridge = value; }
+    public string CurrentPlayerType { get => currentPlayerType; set => currentPlayerType = value; }
+
     public void SetBridge(int x, int y, string type, Quaternion rotation, Vector3 position)
     {
         RemoveTempBridges();
@@ -33,22 +40,26 @@ public class ManageMatrix : MonoBehaviour
             newObject.transform.parent = this.transform;
         }
 
+        isSetBridge = true;
         UpdateMatrix(matrix);
         PrintMatrix(matrix);
     }
 
     public void CheckAndPlace(int x, int y, string type)
     {
-        this.type = type;
-        matrix = gameObject.GetComponent<Matrix>().getMatrix();
-        PrintMatrix(matrix);
-        RemoveTempBridges();
+        if ((currentPlayerType.Equals("Green") && type.Equals("GreenPier")) || (currentPlayerType.Equals("Red") && type.Equals("RedPier")))
+        {
+            this.type = type;
+            matrix = gameObject.GetComponent<Matrix>().getMatrix();
+            PrintMatrix(matrix);
+            RemoveTempBridges();
 
-        // Überprüfen und Platzieren für oben, unten, links, rechts
-        TryPlaceAt(x, y - 1, "o"); // Oben
-        TryPlaceAt(x, y + 1, "u"); // Unten
-        TryPlaceAt(x - 1, y, "l"); // Links
-        TryPlaceAt(x + 1, y, "r"); // Rechts
+            // Überprüfen und Platzieren für oben, unten, links, rechts
+            TryPlaceAt(x, y - 1, "o"); // Oben
+            TryPlaceAt(x, y + 1, "u"); // Unten
+            TryPlaceAt(x - 1, y, "l"); // Links
+            TryPlaceAt(x + 1, y, "r"); // Rechts
+        }
     }
 
     private void TryPlaceAt(int x, int y, string direction)
