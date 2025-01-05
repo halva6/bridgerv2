@@ -45,6 +45,47 @@ public class ManageMatrix : MonoBehaviour
         PrintMatrix(matrix);
     }
 
+    public void setEnemyBridge(int x, int y)
+    {
+        float offsetX = -matrix.GetLength(1) * cellSize / 2 + cellSize / 2;
+        float offsetY = matrix.GetLength(0) * cellSize / 2 - cellSize / 2;
+        Vector3 position = new Vector3(x * cellSize + offsetX, -y * cellSize + offsetY, 0);
+
+        Quaternion rotation = ShouldRotate(y, x, 2) ? Quaternion.Euler(0, 0, 90) : Quaternion.identity;
+
+        GameObject newObject = Instantiate(redBridgePrefab, position, rotation);
+
+        if (newObject != null)
+        {
+            newObject.transform.parent = this.transform;
+        }
+
+        matrix[y, x] = 4; // Red Bridge
+
+        UpdateMatrix(matrix);
+        PrintMatrix(matrix);
+    }
+
+
+    bool ShouldRotate(int row, int col, int target)
+    {
+        bool rotate = false;
+
+        // Überprüfe die obere Zelle
+        if (row > 0 && matrix[row - 1, col] == target)
+        {
+            rotate = true;
+        }
+
+        // Überprüfe die untere Zelle
+        if (row < matrix.GetLength(0) - 1 && matrix[row + 1, col] == target)
+        {
+            rotate = true;
+        }
+
+        return rotate;
+    }
+
     public void CheckAndPlace(int x, int y, string type)
     {
         if ((currentPlayerType.Equals("Green") && type.Equals("GreenPier")) || (currentPlayerType.Equals("Red") && type.Equals("RedPier")))

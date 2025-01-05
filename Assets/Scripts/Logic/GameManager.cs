@@ -1,11 +1,14 @@
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
     [SerializeField] bool multiplayer;
+    [SerializeField] int simulationsNumber;
 
     private int[,] matrix;
+    private bool gameOver = false;
     private PresentMatrix presentMatrix;
     private ManageMatrix manageMatrix;
 
@@ -22,46 +25,92 @@ public class GameManager : MonoBehaviour
 
         manageMatrix.CurrentPlayerType = currentPlayer;
         presentMatrix.SpawnMatrix(this.matrix);
-        
+
     }
 
     // Update is called once per frame 
     void Update()
     {
-        if(multiplayer)
+        if (!gameOver)
         {
-            manageMatrix.CurrentPlayerType = currentPlayer;
+            int[,] transformedMatrix = TransformMatrix(matrix);
 
-            if(manageMatrix.IsSetBridge)
+            if (multiplayer)
             {
-                int [,] transformedMatrix = TransformMatrix(matrix);
-                ManageMatrix.PrintMatrix(transformedMatrix);
-                bool greenWin = matrixLogic.checkWinner(transformedMatrix, 1);
-                bool redWin = matrixLogic.checkWinner(transformedMatrix, 2);
+                manageMatrix.CurrentPlayerType = currentPlayer;
 
-                if(greenWin)
+                if (manageMatrix.IsSetBridge)
                 {
-                    Debug.Log("[DEBUG] green wins");
-                }
-                
-                if(redWin)
-                {
-                    Debug.Log("[DEBUG] red wins");
-                }
 
-                if(currentPlayer.Equals("Green"))
-                {
-                    currentPlayer = "Red";
-                }else
-                {
-                    //currentPlayer = "Green";
+                    if (currentPlayer.Equals("Green"))
+                    {
+                        currentPlayer = "Red";
+                    }
+                    else
+                    {
+                        currentPlayer = "Green";
+                    }
+                    manageMatrix.IsSetBridge = false;
                 }
-                manageMatrix.IsSetBridge = false;
+            }
+            else
+            {
+                manageMatrix.CurrentPlayerType = currentPlayer;
+
+                if (manageMatrix.IsSetBridge)
+                {
+
+                    if (currentPlayer.Equals("Green"))
+                    {
+                        currentPlayer = "Computer";
+                    }
+
+                    manageMatrix.IsSetBridge = false;
+
+                }
+                else if (currentPlayer.Equals("Computer"))
+                {
+                    currentPlayer = "Green";
+                    StartCoroutine(RunMCTSAsync(transformedMatrix));
+                    manageMatrix.IsSetBridge = false;
+
+                }
+            }
+
+            //ManageMatrix.PrintMatrix(transformedMatrix);
+            bool greenWin = matrixLogic.checkWinner(transformedMatrix, 1);
+            bool redWin = matrixLogic.checkWinner(transformedMatrix, 2);
+
+            if (greenWin)
+            {
+                Debug.Log("[DEBUG] green wins");
+                gameOver = true;
+            }
+
+            if (redWin)
+            {
+                Debug.Log("[DEBUG] red wins");
+                gameOver = true;
             }
         }
     }
 
-    private int[,] TransformMatrix(int [,] matrix)
+    private IEnumerator RunMCTSAsync(int[,] transformedMatrix)
+    {
+        //isThinking = true;
+        //loadingBar.SetActive(true);
+        var task = matrixLogic.getBestMCTSAsync(transformedMatrix, simulationsNumber);
+        yield return new WaitUntil(() => task.IsCompleted);
+
+        (int, int) coordsEnemy = task.Result;
+        Debug.Log($"Best Move: ({coordsEnemy.Item1}, {coordsEnemy.Item2})");
+        manageMatrix.setEnemyBridge(coordsEnemy.Item2, coordsEnemy.Item1);
+        //setEnemyBridge(redBridge, coordsEnemy.Item1, coordsEnemy.Item2);
+        //loadingBar.SetActive(false);
+        //isThinking = false;
+    }
+
+    private int[,] TransformMatrix(int[,] matrix)
     {
         for (int y = 0; y < matrix.GetLength(0); y++)
         {
