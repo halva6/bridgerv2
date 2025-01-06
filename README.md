@@ -1,23 +1,27 @@
-# bridgerv2
-A cool logic game in which you have to skillfully build bridges to win
+Here's the translated README.md file:
 
-## Wie funktioniert das Spielprinzip
-Das Spielbrett besteht aus Piers. Jeder die Spieler Rot und Blau haben jeweils 42 Piers. 
-![Ansatz2](https://github.com/user-attachments/assets/8e3091a1-dd24-409b-acaa-de1cf77c1ad8)
+---
 
-Grün hat die zwei äußersten Spalten, während Rot die zwei äußersten Reihen der Matrix besitzt.
-Das Ziel von Grün ist mit Bücken, die oberster und unterste Spalte in einer Linie zu verbinen. Rot hat hingegen das Ziel eine geschlossene Verbinung zwischen den zwei äußersten Reihen zu erstellen.
-Dabei können die Brücken nur auf die weißen Felder gesetzt werden. Die brücken sind dann mit den Piers verbunden und ergeben das sozusagen eine Verbinung. 
-Und wenn einer Verbindung beider Spieler vollständig ist, dann hat dieser Gewonnen.
+# bridgerv2  
+A cool logic game where you skillfully build bridges to win.
 
-Es soll dann ungefähr so in der Theorie sein (Bzw es sind schon leichte überlegungen für die KI mit eingezeichnet):
-![Rechteck](https://github.com/user-attachments/assets/86819cc5-8b2b-4b95-a01d-c8f11f4fab12)
+## How the Gameplay Works  
+The game board consists of piers. Each player, Red and Blue, has 42 piers each.  
+![Approach2](https://github.com/user-attachments/assets/8e3091a1-dd24-409b-acaa-de1cf77c1ad8)  
 
-So jetzt erstmal das Spielprinzip dahinter.
-Die Schwierigkeit dahinter, ist einen Algorithmus zu finden, der erkennt ob ein Spieler gewonnen hat und einen Algorithmus zu finden, welcher in der Lage ist auf Augenhöhe gegen den Menschen zu spielen (auch Zeiteffizent). Hier alle Überlegungen (unübersichtlich) in einem Bild.
-![Ansatz](https://github.com/user-attachments/assets/7f9d8bdf-07e2-4e1d-a9b7-e6f3a793bba7)
+Green controls the two outermost columns, while Red owns the two outermost rows of the matrix.  
+The goal for Green is to connect the top and bottom columns in a straight line using bridges. Red, on the other hand, aims to create a continuous connection between the two outermost rows.  
 
-Prinzipell kann man das auch in einer Matrix darstellen:
+Bridges can only be placed on the white cells. These bridges are connected to the piers, forming a pathway. When one player's connection is complete, that player wins.  
+
+In theory, it might look something like this (note: some early considerations for AI are included):  
+![Rectangle](https://github.com/user-attachments/assets/86819cc5-8b2b-4b95-a01d-c8f11f4fab12)  
+
+Now, let's discuss the game mechanics.  
+The challenge lies in developing an algorithm to detect whether a player has won and another algorithm capable of playing on par with a human (while also being time-efficient). Below is a messy compilation of all considerations in a single image:  
+![Approach](https://github.com/user-attachments/assets/7f9d8bdf-07e2-4e1d-a9b7-e6f3a793bba7)  
+
+This can also be represented as a matrix:  
 ```
 - 1 - 1 - 1 - 1 - 1 - 
 2 0 2 0 2 0 2 0 2 0 2 
@@ -32,9 +36,11 @@ Prinzipell kann man das auch in einer Matrix darstellen:
 - 1 0 1 0 1 0 1 0 1 - 
 2 2 2 2 2 0 2 0 2 0 2 
 - 1 - 1 - 1 - 1 - 1 - 
-```
+```  
 
-0 = leeres Feld / unbesetztes Feld / Platz für Brücken
-1 = grüner Spieler
-2 = roter Spieler / KI
-- = in der Theorie nie besetztes Feld
+0 = empty cell / unoccupied field / space for bridges  
+1 = Green player  
+2 = Red player / AI  
+– = theoretically never occupied  
+
+---
