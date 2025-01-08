@@ -2,7 +2,8 @@ using UnityEngine;
 
 public class Matrix : MonoBehaviour
 {
-    [SerializeField] private int[,] matrix = new int[,]
+    [SerializeField]
+    private int[,] matrix = new int[,]
     {
         { -1,  1, -1,  1, -1,  1, -1,  1, -1,  1, -1 },
         {  2,  0,  2,  0,  2,  0,  2,  3,  2,  0,  2 },
@@ -19,12 +20,12 @@ public class Matrix : MonoBehaviour
         { -1,  1, -1,  1, -1,  1, -1,  1, -1,  1, -1 }
     };
 
-    public int[,] getMatrix()
+    public int[,] GetMatrix()
     {
         return matrix;
     }
 
-    public void setMatrix(int[,] matrix)
+    public void SetMatrix(int[,] matrix)
     {
         this.matrix = matrix;
     }

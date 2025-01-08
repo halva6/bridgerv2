@@ -389,11 +389,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4a8c22482a69f4efab894eef8981edfc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  greenPier: {fileID: 3859884908383802940, guid: 6701f71d25219b89f94598c534370d1c, type: 3}
-  redPier: {fileID: 4111406179857458988, guid: 828c68adc31a21f97bc04ae597f3702e, type: 3}
-  greenBridge: {fileID: 2294943549365909288, guid: 32e18934c329bc42196f18d97fba1c40, type: 3}
-  redBridge: {fileID: 6595218311941121833, guid: 7cc04f75bd0997b84af7cc5160fd2567, type: 3}
-  wall: {fileID: 8975710170332972165, guid: 650e552f3e844abb185d3062e0b879aa, type: 3}
+  greenPierPrefab: {fileID: 3859884908383802940, guid: 6701f71d25219b89f94598c534370d1c, type: 3}
+  redPierPrefab: {fileID: 4111406179857458988, guid: 828c68adc31a21f97bc04ae597f3702e, type: 3}
+  greenBridgePrefab: {fileID: 2294943549365909288, guid: 32e18934c329bc42196f18d97fba1c40, type: 3}
+  redBridgePrefab: {fileID: 0}
+  wallPrefab: {fileID: 6595218311941121833, guid: 7cc04f75bd0997b84af7cc5160fd2567, type: 3}
   cellSize: 1
 --- !u!4 &1055742624
 Transform:
@@ -450,9 +450,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1280fc07522434aad9c06b903736d40b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  multiplayer: 0
-  simulationsNumber: 50
-  currentPlayer: Green
+  tempBridgePrefab: {fileID: 8975710170332972165, guid: f87e628db9cda4abaa28dea217b6a10f, type: 3}
+  greenBridgePrefab: {fileID: 2294943549365909288, guid: 32e18934c329bc42196f18d97fba1c40, type: 3}
+  redBridgePrefab: {fileID: 6595218311941121833, guid: 7cc04f75bd0997b84af7cc5160fd2567, type: 3}
+  cellSize: 1
 --- !u!114 &1055742628
 MonoBehaviour:
   m_ObjectHideFlags: 0

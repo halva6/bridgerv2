@@ -1,116 +1,127 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
-    [SerializeField] bool multiplayer;
-    [SerializeField] int simulationsNumber;
+    [SerializeField] private bool isMultiplayer;
+    [SerializeField] private int simulationCount;
+    [SerializeField] private string initialPlayer = "Green";
 
-    private int[,] matrix;
-    private bool gameOver = false;
-    private PresentMatrix presentMatrix;
-    private ManageMatrix manageMatrix;
+    private int[,] gameMatrix;
+    private bool isGameOver;
 
+    private MatrixVisualizer matrixVisualizer;
+    private MatrixManager matrixManager;
     private MatrixLogic matrixLogic;
 
-    [SerializeField] private string currentPlayer = "Green";
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    private string currentPlayer;
+
+    private void Start()
     {
-        matrix = gameObject.GetComponent<Matrix>().getMatrix();
-        presentMatrix = gameObject.GetComponent<PresentMatrix>();
-        manageMatrix = gameObject.GetComponent<ManageMatrix>();
-        matrixLogic = gameObject.GetComponent<MatrixLogic>();
-
-        manageMatrix.CurrentPlayerType = currentPlayer;
-        presentMatrix.SpawnMatrix(this.matrix);
-
+        InitializeComponents();
+        InitializeGame();
     }
 
-    // Update is called once per frame 
-    void Update()
+    private void Update()
     {
-        if (!gameOver)
+        if (!isGameOver)
         {
-            int[,] transformedMatrix = TransformMatrix(matrix);
+            HandleGameLogic();
+        }
+    }
 
-            if (multiplayer)
-            {
-                manageMatrix.CurrentPlayerType = currentPlayer;
+    private void InitializeComponents()
+    {
+        gameMatrix = GetComponent<Matrix>().GetMatrix();
+        matrixVisualizer = GetComponent<MatrixVisualizer>();
+        matrixManager = GetComponent<MatrixManager>();
+        matrixLogic = GetComponent<MatrixLogic>();
+    }
 
-                if (manageMatrix.IsSetBridge)
-                {
+    private void InitializeGame()
+    {
+        currentPlayer = initialPlayer;
+        matrixManager.CurrentPlayer = currentPlayer;
+        matrixVisualizer.VisualizeMatrix(gameMatrix);
+        isGameOver = false;
+    }
 
-                    if (currentPlayer.Equals("Green"))
-                    {
-                        currentPlayer = "Red";
-                    }
-                    else
-                    {
-                        currentPlayer = "Green";
-                    }
-                    manageMatrix.IsSetBridge = false;
-                }
-            }
-            else
-            {
-                manageMatrix.CurrentPlayerType = currentPlayer;
+    private void HandleGameLogic()
+    {
+        int[,] transformedMatrix = TransformMatrixValues(gameMatrix);
 
-                if (manageMatrix.IsSetBridge)
-                {
+        if (isMultiplayer)
+        {
+            HandleMultiplayerLogic();
+        }
+        else
+        {
+            HandleSinglePlayerLogic(transformedMatrix);
+        }
 
-                    if (currentPlayer.Equals("Green"))
-                    {
-                        currentPlayer = "Computer";
-                    }
+        CheckGameOver(transformedMatrix);
+    }
 
-                    manageMatrix.IsSetBridge = false;
+    private void HandleMultiplayerLogic()
+    {
+        matrixManager.CurrentPlayer = currentPlayer;
 
-                }
-                else if (currentPlayer.Equals("Computer"))
-                {
-                    currentPlayer = "Green";
-                    StartCoroutine(RunMCTSAsync(transformedMatrix));
-                    manageMatrix.IsSetBridge = false;
+        if (matrixManager.IsBridgePlaced)
+        {
+            SwitchPlayer();
+            matrixManager.IsBridgePlaced = false;
+        }
+    }
 
-                }
-            }
+    private void HandleSinglePlayerLogic(int[,] transformedMatrix)
+    {
+        matrixManager.CurrentPlayer = currentPlayer;
 
-            //ManageMatrix.PrintMatrix(transformedMatrix);
-            bool greenWin = matrixLogic.checkWinner(transformedMatrix, 1);
-            bool redWin = matrixLogic.checkWinner(transformedMatrix, 2);
-
-            if (greenWin)
-            {
-                Debug.Log("[DEBUG] green wins");
-                gameOver = true;
-            }
-
-            if (redWin)
-            {
-                Debug.Log("[DEBUG] red wins");
-                gameOver = true;
-            }
+        if (matrixManager.IsBridgePlaced)
+        {
+            currentPlayer = currentPlayer.Equals("Green") ? "Computer" : "Green";
+            matrixManager.IsBridgePlaced = false;
+        }
+        else if (currentPlayer.Equals("Computer"))
+        {
+            StartCoroutine(RunMCTSAsync(transformedMatrix));
         }
     }
 
     private IEnumerator RunMCTSAsync(int[,] transformedMatrix)
     {
-        //isThinking = true;
-        //loadingBar.SetActive(true);
-        var task = matrixLogic.getBestMCTSAsync(transformedMatrix, simulationsNumber);
-        yield return new WaitUntil(() => task.IsCompleted);
+        var mctsTask = matrixLogic.getBestMCTSAsync(transformedMatrix, simulationCount);
+        yield return new WaitUntil(() => mctsTask.IsCompleted);
 
-        (int, int) coordsEnemy = task.Result;
-        Debug.Log($"Best Move: ({coordsEnemy.Item1}, {coordsEnemy.Item2})");
-        manageMatrix.setEnemyBridge(coordsEnemy.Item2, coordsEnemy.Item1);
-        //setEnemyBridge(redBridge, coordsEnemy.Item1, coordsEnemy.Item2);
-        //loadingBar.SetActive(false);
-        //isThinking = false;
+        (int row, int col) = mctsTask.Result;
+        Debug.Log($"Best Move: ({row}, {col})");
+        matrixManager.SetBridgeForOpponent(row, col);
     }
 
-    private int[,] TransformMatrix(int[,] matrix)
+    private void CheckGameOver(int[,] transformedMatrix)
+    {
+        bool greenWins = matrixLogic.checkWinner(transformedMatrix, 1);
+        bool redWins = matrixLogic.checkWinner(transformedMatrix, 2);
+
+        if (greenWins)
+        {
+            Debug.Log("Green wins!");
+            isGameOver = true;
+        }
+
+        if (redWins)
+        {
+            Debug.Log("Red wins!");
+            isGameOver = true;
+        }
+    }
+
+    private void SwitchPlayer()
+    {
+        currentPlayer = currentPlayer.Equals("Green") ? "Red" : "Green";
+    }
+
+    private int[,] TransformMatrixValues(int[,] matrix)
     {
         for (int y = 0; y < matrix.GetLength(0); y++)
         {

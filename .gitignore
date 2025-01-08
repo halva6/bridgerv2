@@ -68,6 +68,10 @@ crashlytics-build.properties
 # Packed Addressables
 /[Aa]ssets/[Aa]ddressable[Aa]ssets[Dd]ata/*/*.bin*
 
+#Text Mesh Pro
+/[Aa]ssets/[Tt]extMesh Pro/
+/[Aa]ssets/[Tt]extMesh Pro.meta
+
 # Temporary auto-generated Android Assets
 /[Aa]ssets/[Ss]treamingAssets/aa.meta
 /[Aa]ssets/[Ss]treamingAssets/aa/*

@@ -1,104 +1,105 @@
 using System;
-using System.Collections.Generic;
-using Unity.Collections;
 using UnityEngine;
 
-public class PresentMatrix : MonoBehaviour
+public class MatrixVisualizer : MonoBehaviour
 {
-    // GameObjects für die verschiedenen Werte
-    [SerializeField] private GameObject greenPier;
-    [SerializeField] private GameObject redPier;
-    [SerializeField] private GameObject greenBridge;
-    [SerializeField] private GameObject redBridge;
-    [SerializeField] private GameObject wall;
-
-    // Die Matrix
-    private int[,] matrix;
+    [SerializeField] private GameObject greenPierPrefab;
+    [SerializeField] private GameObject redPierPrefab;
+    [SerializeField] private GameObject greenBridgePrefab;
+    [SerializeField] private GameObject redBridgePrefab;
+    [SerializeField] private GameObject wallPrefab;
 
     [SerializeField] private float cellSize = 1.0f;
 
-    public void SpawnMatrix(int[,] matrix)
+    private int[,] matrix;
+
+    public void VisualizeMatrix(int[,] inputMatrix)
     {
-        this.matrix = matrix;
-        int rows = matrix.GetLength(0);
-        int cols = matrix.GetLength(1);
+        matrix = inputMatrix;
+        Vector2 offset = CalculateMatrixOffset(matrix);
 
-        // Berechne den Offset, um die Matrix in die Bildschirmmitte zu setzen
-        float offsetX = -cols * cellSize / 2 + cellSize / 2;
-        float offsetY = rows * cellSize / 2 - cellSize / 2;
-
-        for (int row = 0; row < rows; row++)
+        for (int row = 0; row < matrix.GetLength(0); row++)
         {
-            for (int col = 0; col < cols; col++)
+            for (int col = 0; col < matrix.GetLength(1); col++)
             {
-                int value = matrix[row, col];
-                Vector3 position = new Vector3(col * cellSize + offsetX, -row * cellSize + offsetY, 0);
-                GameObject toSpawn = null;
-                Quaternion rotation = Quaternion.identity;
-
-                switch (value)
-                {
-                    case -1:
-                        toSpawn = Instantiate(wall, position, Quaternion.identity);
-                        if (col == 0 || col == cols - 1)
-                        {
-                            toSpawn.transform.rotation = Quaternion.Euler(0, 0, 90);
-                        }
-                        break;
-
-                    case 1:
-                        toSpawn = Instantiate(greenPier, position, Quaternion.identity);
-                        addData(toSpawn, col, row, "GreenPier");
-                        break;
-
-                    case 2:
-                        toSpawn = Instantiate(redPier, position, Quaternion.identity);
-                        addData(toSpawn, col, row, "RedPier");
-                        break;
-
-                    case 3:
-                        rotation = ShouldRotate(row, col, 1) ? Quaternion.Euler(0, 0, 90) : Quaternion.identity;
-                        toSpawn = Instantiate(greenBridge, position, rotation);
-                        break;
-
-                    case 4:
-                        rotation = ShouldRotate(row, col, 2) ? Quaternion.Euler(0, 0, 90) : Quaternion.identity;
-                        toSpawn = Instantiate(redBridge, position, rotation);
-                        break;
-                }
-
-                if (toSpawn != null)
-                {
-                    toSpawn.transform.parent = this.transform; // Ordnung im Hierarchy-Fenster
-                }
+                SpawnCell(row, col, offset);
             }
         }
     }
 
-    void addData(GameObject toSpawn, int col, int row, string type)
+    private Vector2 CalculateMatrixOffset(int[,] matrix)
     {
-        ObjectDataPier data = toSpawn.AddComponent<ObjectDataPier>();
-        data.X = col;
-        data.Y = row;
-        data.Type = type;
+        float offsetX = -matrix.GetLength(1) * cellSize / 2 + cellSize / 2;
+        float offsetY = matrix.GetLength(0) * cellSize / 2 - cellSize / 2;
+        return new Vector2(offsetX, offsetY);
     }
 
-    bool ShouldRotate(int row, int col, int target)
+    private void SpawnCell(int row, int col, Vector2 offset)
     {
-        bool rotate = false;
+        int cellValue = matrix[row, col];
+        Vector3 position = new Vector3(col * cellSize + offset.x, -row * cellSize + offset.y, 0);
+        GameObject cellPrefab = GetPrefabForCellValue(cellValue);
 
-        // Überprüfe die obere Zelle
-        if (row > 0 && matrix[row - 1, col] == target)
+        if (cellPrefab != null)
         {
-            rotate = true;
+            Quaternion rotation = GetRotationForCell(row, col, cellValue);
+            GameObject instance = Instantiate(cellPrefab, position, rotation, transform);
+            AttachMetadata(instance, row, col, cellValue);
         }
-
-        // Überprüfe die untere Zelle
-        if (row < matrix.GetLength(0) - 1 && matrix[row + 1, col] == target)
-        {
-            rotate = true;
-        }
-
-        return rotate;
     }
+
+    private GameObject GetPrefabForCellValue(int value)
+    {
+        return value switch
+        {
+            -1 => wallPrefab,
+            1 => greenPierPrefab,
+            2 => redPierPrefab,
+            3 => greenBridgePrefab,
+            4 => redBridgePrefab,
+            _ => null,
+        };
+    }
+
+    private Quaternion GetRotationForCell(int row, int col, int value)
+    {
+        if (value == 3 || value == 4)
+        {
+            int targetValue = value == 3 ? 1 : 2;
+            if (ShouldRotate(row, col, targetValue))
+            {
+                return Quaternion.Euler(0, 0, 90);
+            }
+        }
+        else if (value == -1 && (col == 0 || col == matrix.GetLength(1) - 1))
+        {
+            return Quaternion.Euler(0, 0, 90);
+        }
+
+        return Quaternion.identity;
+    }
+
+    private bool ShouldRotate(int row, int col, int targetValue)
+    {
+        return (row > 0 && matrix[row - 1, col] == targetValue) ||
+               (row < matrix.GetLength(0) - 1 && matrix[row + 1, col] == targetValue);
+    }
+
+    private void AttachMetadata(GameObject instance, int row, int col, int value)
+    {
+        if (value == 1 || value == 2)
+        {
+            var pierData = instance.AddComponent<PierMetadata>();
+            pierData.Row = row;
+            pierData.Column = col;
+            pierData.Type = value == 1 ? "GreenPier" : "RedPier";
+        }
+    }
+}
+
+public class PierMetadata : MonoBehaviour
+{
+    public int Row { get; set; }
+    public int Column { get; set; }
+    public string Type { get; set; }
 }

@@ -1,175 +1,155 @@
 using System;
 using UnityEngine;
 
-public class ManageMatrix : MonoBehaviour
+public class MatrixManager : MonoBehaviour
 {
     [SerializeField] private GameObject tempBridgePrefab;
     [SerializeField] private GameObject greenBridgePrefab;
     [SerializeField] private GameObject redBridgePrefab;
     [SerializeField] private float cellSize = 1f;
-    private int[,] matrix;
-    private string type;
 
-    private string currentPlayerType;
+    private int[,] gameMatrix;
+    private string currentPlayer;
+    private bool isBridgePlaced;
 
-    private bool isSetBridge = false;
+    public bool IsBridgePlaced { get => isBridgePlaced; set => isBridgePlaced = value; }
+    public string CurrentPlayer { get => currentPlayer; set => currentPlayer = value; }
 
-    public bool IsSetBridge { get => isSetBridge; set => isSetBridge = value; }
-    public string CurrentPlayerType { get => currentPlayerType; set => currentPlayerType = value; }
-
-    public void SetBridge(int x, int y, string type, Quaternion rotation, Vector3 position)
+    public void PlaceBridge(int x, int y, string pierType, Quaternion rotation, Vector3 position)
     {
-        RemoveTempBridges();
-        Debug.Log($"Setting bridge at ({x}, {y}) with type: {type}");
+        ClearTemporaryBridges();
+        Debug.Log($"Placing bridge at ({x}, {y}) for: {pierType}");
 
-        GameObject newObject = null;
+        GameObject newBridge = pierType == "RedPier"
+            ? Instantiate(redBridgePrefab, position, rotation)
+            : Instantiate(greenBridgePrefab, position, rotation);
 
-        if (type.Equals("RedPier"))
+        if (newBridge != null)
         {
-            newObject = Instantiate(redBridgePrefab, position, rotation);
-            matrix[y, x] = 4; // Red Bridge
-        }
-        else if (type.Equals("GreenPier"))
-        {
-            newObject = Instantiate(greenBridgePrefab, position, rotation);
-            matrix[y, x] = 3; // Green Bridge
+            newBridge.transform.parent = this.transform;
+            gameMatrix[y, x] = pierType == "RedPier" ? 4 : 3; // Red Bridge: 4, Green Bridge: 3
         }
 
-        if (newObject != null)
-        {
-            newObject.transform.parent = this.transform;
-        }
-
-        isSetBridge = true;
-        UpdateMatrix(matrix);
-        PrintMatrix(matrix);
+        isBridgePlaced = true;
+        UpdateGameMatrix(gameMatrix);
+        LogMatrix(gameMatrix);
     }
 
-    public void setEnemyBridge(int x, int y)
+    public void PlaceOpponentBridge(int x, int y)
     {
-        float offsetX = -matrix.GetLength(1) * cellSize / 2 + cellSize / 2;
-        float offsetY = matrix.GetLength(0) * cellSize / 2 - cellSize / 2;
-        Vector3 position = new Vector3(x * cellSize + offsetX, -y * cellSize + offsetY, 0);
-
+        Vector3 position = CalculatePosition(x, y);
         Quaternion rotation = ShouldRotate(y, x, 2) ? Quaternion.Euler(0, 0, 90) : Quaternion.identity;
 
-        GameObject newObject = Instantiate(redBridgePrefab, position, rotation);
+        GameObject newBridge = Instantiate(redBridgePrefab, position, rotation);
 
-        if (newObject != null)
+        if (newBridge != null)
         {
-            newObject.transform.parent = this.transform;
+            newBridge.transform.parent = this.transform;
+            gameMatrix[y, x] = 4; // Red Bridge
         }
 
-        matrix[y, x] = 4; // Red Bridge
-
-        UpdateMatrix(matrix);
-        PrintMatrix(matrix);
+        UpdateGameMatrix(gameMatrix);
+        LogMatrix(gameMatrix);
     }
 
-
-    bool ShouldRotate(int row, int col, int target)
+    public void EvaluateAndPlaceBridge(int x, int y, string pierType)
     {
-        bool rotate = false;
+        if (!IsValidPlayerPier(pierType)) return;
 
-        // Überprüfe die obere Zelle
-        if (row > 0 && matrix[row - 1, col] == target)
-        {
-            rotate = true;
-        }
+        gameMatrix = GetComponent<Matrix>().GetMatrix();
+        ClearTemporaryBridges();
 
-        // Überprüfe die untere Zelle
-        if (row < matrix.GetLength(0) - 1 && matrix[row + 1, col] == target)
-        {
-            rotate = true;
-        }
-
-        return rotate;
+        TryPlaceBridge(x, y - 1, "Up");
+        TryPlaceBridge(x, y + 1, "Down");
+        TryPlaceBridge(x - 1, y, "Left");
+        TryPlaceBridge(x + 1, y, "Right");
     }
 
-    public void CheckAndPlace(int x, int y, string type)
+    private void TryPlaceBridge(int x, int y, string direction)
     {
-        if ((currentPlayerType.Equals("Green") && type.Equals("GreenPier")) || (currentPlayerType.Equals("Red") && type.Equals("RedPier")))
-        {
-            this.type = type;
-            matrix = gameObject.GetComponent<Matrix>().getMatrix();
-            PrintMatrix(matrix);
-            RemoveTempBridges();
+        if (!IsPositionValid(x, y)) return;
 
-            // Überprüfen und Platzieren für oben, unten, links, rechts
-            TryPlaceAt(x, y - 1, "o"); // Oben
-            TryPlaceAt(x, y + 1, "u"); // Unten
-            TryPlaceAt(x - 1, y, "l"); // Links
-            TryPlaceAt(x + 1, y, "r"); // Rechts
-        }
+        Vector3 position = CalculatePosition(x, y);
+        Quaternion rotation = CalculateRotation(direction);
+
+        GameObject tempBridge = Instantiate(tempBridgePrefab, position, rotation);
+        tempBridge.transform.parent = this.transform;
+
+        AddTemporaryBridgeData(tempBridge, x, y, rotation);
+
+        gameMatrix[y, x] = 5; // Mark as temporary bridge
     }
 
-    private void TryPlaceAt(int x, int y, string direction)
+    private void ClearTemporaryBridges()
     {
-        // Überprüfen, ob die Position innerhalb der Matrix liegt
-        if (y < 0 || x < 0 || y >= matrix.GetLength(0) || x >= matrix.GetLength(1)) return;
-
-        // Nur weiter machen, wenn die Matrix an der Stelle 0 ist
-        if (matrix[y, x] == 0)
-        {
-            // Position für das neue GameObject berechnen
-            float offsetX = -matrix.GetLength(1) * cellSize / 2 + cellSize / 2;
-            float offsetY = matrix.GetLength(0) * cellSize / 2 - cellSize / 2;
-            Vector3 position = new Vector3(x * cellSize + offsetX, -y * cellSize + offsetY, 0);
-
-            // Rotation basierend auf Richtung setzen
-            Quaternion rotation = Quaternion.identity;
-            if (direction == "o" || direction == "u") // Oben oder Unten
-            {
-                rotation = Quaternion.Euler(0, 0, 90);
-            }
-
-            // Temporäres Objekt instanziieren
-            GameObject tempObject = Instantiate(tempBridgePrefab, position, rotation);
-            tempObject.transform.parent = this.transform;
-
-            // Daten dem temporären Objekt hinzufügen
-            ObjectDataTempBridge tempData = tempObject.AddComponent<ObjectDataTempBridge>();
-            tempData.Type = this.type;
-            tempData.Rotation = rotation;
-            tempData.Position = position;
-            tempData.X = x;
-            tempData.Y = y;
-
-            // Matrix aktualisieren
-            matrix[y, x] = 5; // Temporäre Brücke markieren
-        }
-    }
-
-    private void RemoveTempBridges()
-    {
-        // Alle temporären Brücken entfernen
         foreach (GameObject temp in GameObject.FindGameObjectsWithTag("Temp"))
         {
             Destroy(temp);
         }
 
-        // Temporäre Brücken in der Matrix zurücksetzen
-        for (int y = 0; y < matrix.GetLength(0); y++)
+        ResetTemporaryBridgesInMatrix();
+    }
+
+    private void ResetTemporaryBridgesInMatrix()
+    {
+        for (int y = 0; y < gameMatrix.GetLength(0); y++)
         {
-            for (int x = 0; x < matrix.GetLength(1); x++)
+            for (int x = 0; x < gameMatrix.GetLength(1); x++)
             {
-                if (matrix[y, x] == 5) // Temporäre Brücken
+                if (gameMatrix[y, x] == 5)
                 {
-                    matrix[y, x] = 0; // Zurücksetzen
+                    gameMatrix[y, x] = 0;
                 }
             }
         }
     }
 
-    private void UpdateMatrix(int[,] updatedMatrix)
+    private bool ShouldRotate(int row, int col, int target)
     {
-        gameObject.GetComponent<Matrix>().setMatrix(updatedMatrix);
+        return (row > 0 && gameMatrix[row - 1, col] == target) ||
+               (row < gameMatrix.GetLength(0) - 1 && gameMatrix[row + 1, col] == target);
     }
 
-    public static void PrintMatrix(int[,] matrix)
+    private bool IsPositionValid(int x, int y)
+    {
+        return y >= 0 && x >= 0 && y < gameMatrix.GetLength(0) && x < gameMatrix.GetLength(1) && gameMatrix[y, x] == 0;
+    }
+
+    private bool IsValidPlayerPier(string pierType)
+    {
+        return (currentPlayer == "Green" && pierType == "GreenPier") || (currentPlayer == "Red" && pierType == "RedPier");
+    }
+
+    private Vector3 CalculatePosition(int x, int y)
+    {
+        float offsetX = -gameMatrix.GetLength(1) * cellSize / 2 + cellSize / 2;
+        float offsetY = gameMatrix.GetLength(0) * cellSize / 2 - cellSize / 2;
+        return new Vector3(x * cellSize + offsetX, -y * cellSize + offsetY, 0);
+    }
+
+    private Quaternion CalculateRotation(string direction)
+    {
+        return (direction == "Up" || direction == "Down") ? Quaternion.Euler(0, 0, 90) : Quaternion.identity;
+    }
+
+    private void AddTemporaryBridgeData(GameObject tempBridge, int x, int y, Quaternion rotation)
+    {
+        var tempData = tempBridge.AddComponent<ObjectDataTempBridge>();
+        tempData.Type = currentPlayer;
+        tempData.Rotation = rotation;
+        tempData.Position = CalculatePosition(x, y);
+        tempData.X = x;
+        tempData.Y = y;
+    }
+
+    private void UpdateGameMatrix(int[,] updatedMatrix)
+    {
+        GetComponent<Matrix>().SetMatrix(updatedMatrix);
+    }
+
+    public static void LogMatrix(int[,] matrix)
     {
         string output = "";
-
         for (int y = 0; y < matrix.GetLength(0); y++)
         {
             for (int x = 0; x < matrix.GetLength(1); x++)
@@ -178,7 +158,6 @@ public class ManageMatrix : MonoBehaviour
             }
             output += "\n";
         }
-
         Debug.Log(output);
     }
 }

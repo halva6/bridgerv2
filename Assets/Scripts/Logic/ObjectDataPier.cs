@@ -12,11 +12,6 @@ public class ObjectDataPier : MonoBehaviour
     public int Y { get => y; set => y = value; }
     public string Type { get => type; set => type = value; }
 
-    void Start()
-    {
-        //Debug.Log("Gameobject: " + type + " Pos: " + X.ToString() + ";" + Y.ToString());
-    }
-
     void Update()
     {
         // Überprüfen, ob die linke Maustaste gedrückt wurde
@@ -45,8 +40,8 @@ public class ObjectDataPier : MonoBehaviour
             if (hit.collider.gameObject == this.gameObject)
             {
                 //Debug.Log("Click: " + type + " Pos: " + X.ToString() + ";" + Y.ToString());
-                ManageMatrix mm = GetComponentInParent<ManageMatrix>();
-                mm?.CheckAndPlace(X,Y, type);
+                MatrixManager mm = GetComponentInParent<MatrixManager>();
+                mm?.EvaluateAndPlaceBridge(X, Y, type);
             }
         }
     }
