@@ -39,7 +39,7 @@ public class ObjectDataPier : MonoBehaviour
         {
             if (hit.collider.gameObject == this.gameObject)
             {
-                //Debug.Log("Click: " + type + " Pos: " + X.ToString() + ";" + Y.ToString());
+                Debug.Log("Click: " + type + " Pos: " + X.ToString() + ";" + Y.ToString());
                 MatrixManager mm = GetComponentInParent<MatrixManager>();
                 mm?.EvaluateAndPlaceBridge(X, Y, type);
             }

@@ -450,10 +450,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1280fc07522434aad9c06b903736d40b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  tempBridgePrefab: {fileID: 8975710170332972165, guid: f87e628db9cda4abaa28dea217b6a10f, type: 3}
-  greenBridgePrefab: {fileID: 2294943549365909288, guid: 32e18934c329bc42196f18d97fba1c40, type: 3}
-  redBridgePrefab: {fileID: 6595218311941121833, guid: 7cc04f75bd0997b84af7cc5160fd2567, type: 3}
-  cellSize: 1
+  isMultiplayer: 1
+  simulationCount: 100
+  initialPlayer: Green
 --- !u!114 &1055742628
 MonoBehaviour:
   m_ObjectHideFlags: 0

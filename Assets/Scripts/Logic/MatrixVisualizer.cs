@@ -89,17 +89,11 @@ public class MatrixVisualizer : MonoBehaviour
     {
         if (value == 1 || value == 2)
         {
-            var pierData = instance.AddComponent<PierMetadata>();
-            pierData.Row = row;
-            pierData.Column = col;
+            var pierData = instance.AddComponent<ObjectDataPier>();
+            pierData.X = col;
+            pierData.Y = row;
             pierData.Type = value == 1 ? "GreenPier" : "RedPier";
         }
     }
 }
 
-public class PierMetadata : MonoBehaviour
-{
-    public int Row { get; set; }
-    public int Column { get; set; }
-    public string Type { get; set; }
-}

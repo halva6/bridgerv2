@@ -95,7 +95,7 @@ public class GameManager : MonoBehaviour
 
         (int row, int col) = mctsTask.Result;
         Debug.Log($"Best Move: ({row}, {col})");
-        matrixManager.SetBridgeForOpponent(row, col);
+        matrixManager.PlaceOpponentBridge(row, col);
     }
 
     private void CheckGameOver(int[,] transformedMatrix)

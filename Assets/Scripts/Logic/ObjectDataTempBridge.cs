@@ -42,8 +42,8 @@ public class ObjectDataTempBridge : MonoBehaviour
         {
             if (hit.collider.gameObject == this.gameObject)
             {
-                ManageMatrix mm = GetComponentInParent<ManageMatrix>();
-                mm?.SetBridge(X, Y, type, rotaion, position);
+                MatrixManager mm = GetComponentInParent<MatrixManager>();
+                mm?.PlaceBridge(X, Y, type, rotaion, position);
             }
         }
     }
