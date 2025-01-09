@@ -20,14 +20,14 @@ public class MatrixManager : MonoBehaviour
         ClearTemporaryBridges();
         Debug.Log($"Placing bridge at ({x}, {y}) for: {pierType}");
 
-        GameObject newBridge = pierType == "RedPier"
+        GameObject newBridge = pierType == "Red"
             ? Instantiate(redBridgePrefab, position, rotation)
             : Instantiate(greenBridgePrefab, position, rotation);
 
         if (newBridge != null)
         {
             newBridge.transform.parent = this.transform;
-            gameMatrix[y, x] = pierType == "RedPier" ? 4 : 3; // Red Bridge: 4, Green Bridge: 3
+            gameMatrix[y, x] = pierType == "Red" ? 4 : 3; // Red Bridge: 4, Green Bridge: 3
         }
 
         isBridgePlaced = true;

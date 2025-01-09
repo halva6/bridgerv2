@@ -393,7 +393,7 @@ MonoBehaviour:
   redPierPrefab: {fileID: 4111406179857458988, guid: 828c68adc31a21f97bc04ae597f3702e, type: 3}
   greenBridgePrefab: {fileID: 2294943549365909288, guid: 32e18934c329bc42196f18d97fba1c40, type: 3}
   redBridgePrefab: {fileID: 6595218311941121833, guid: 7cc04f75bd0997b84af7cc5160fd2567, type: 3}
-  wallPrefab: {fileID: 6595218311941121833, guid: 7cc04f75bd0997b84af7cc5160fd2567, type: 3}
+  wallPrefab: {fileID: 8975710170332972165, guid: 650e552f3e844abb185d3062e0b879aa, type: 3}
   cellSize: 1
 --- !u!4 &1055742624
 Transform:
@@ -451,7 +451,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isMultiplayer: 1
-  simulationCount: 100
+  simulationCount: 1000
   initialPlayer: Green
 --- !u!114 &1055742628
 MonoBehaviour:
