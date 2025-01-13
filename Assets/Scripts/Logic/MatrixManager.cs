@@ -15,8 +15,16 @@ public class MatrixManager : MonoBehaviour
     public bool IsBridgePlaced { get => isBridgePlaced; set => isBridgePlaced = value; }
     public string CurrentPlayer { get => currentPlayer; set => currentPlayer = value; }
 
+    private ResetMove resetMove;
+
+    private void Start()
+    {
+        resetMove = GetComponent<ResetMove>();
+    }
+
     public void PlaceBridge(int x, int y, string pierType, Quaternion rotation, Vector3 position)
     {
+
         ClearTemporaryBridges();
         Debug.Log($"Placing bridge at ({x}, {y}) for: {pierType}");
 
@@ -26,6 +34,8 @@ public class MatrixManager : MonoBehaviour
 
         if (newBridge != null)
         {
+            newBridge.name = $"{x};{y}";
+
             newBridge.transform.parent = this.transform;
             gameMatrix[y, x] = pierType == "Red" ? 4 : 3; // Red Bridge: 4, Green Bridge: 3
         }
@@ -44,6 +54,8 @@ public class MatrixManager : MonoBehaviour
 
         if (newBridge != null)
         {
+            newBridge.name = $"{x};{y}";
+
             newBridge.transform.parent = this.transform;
             gameMatrix[y, x] = 4; // Red Bridge
         }
@@ -144,6 +156,7 @@ public class MatrixManager : MonoBehaviour
 
     private void UpdateGameMatrix(int[,] updatedMatrix)
     {
+        resetMove.SaveState();
         GetComponent<Matrix>().SetMatrix(updatedMatrix);
     }
 

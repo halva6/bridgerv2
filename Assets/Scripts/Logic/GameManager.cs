@@ -52,17 +52,15 @@ public class GameManager : MonoBehaviour
 
         if (isMultiplayer)
         {
-            HandleMultiplayerLogic();
+            HandleMultiplayerLogic(transformedMatrix);
         }
         else
         {
             HandleSinglePlayerLogic(transformedMatrix);
         }
-
-        CheckGameOver(transformedMatrix);
     }
 
-    private void HandleMultiplayerLogic()
+    private void HandleMultiplayerLogic(int[,] transformedMatrix)
     {
         matrixManager.CurrentPlayer = currentPlayer;
 
@@ -70,6 +68,8 @@ public class GameManager : MonoBehaviour
         {
             SwitchPlayer();
             matrixManager.IsBridgePlaced = false;
+            CheckGameOver(transformedMatrix);
+
         }
     }
 
@@ -81,10 +81,13 @@ public class GameManager : MonoBehaviour
         {
             currentPlayer = currentPlayer.Equals("Green") ? "Computer" : "Green";
             matrixManager.IsBridgePlaced = false;
+            CheckGameOver(transformedMatrix);
+
         }
         else if (currentPlayer.Equals("Computer"))
         {
             StartCoroutine(RunMCTSAsync(transformedMatrix));
+            CheckGameOver(transformedMatrix);
         }
     }
 

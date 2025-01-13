@@ -42,6 +42,7 @@ public class MatrixVisualizer : MonoBehaviour
 
         if (cellPrefab != null)
         {
+            cellPrefab.name = $"{row} {col}";
             Quaternion rotation = GetRotationForCell(row, col, cellValue);
             GameObject instance = Instantiate(cellPrefab, position, rotation, transform);
             AttachMetadata(instance, row, col, cellValue);
