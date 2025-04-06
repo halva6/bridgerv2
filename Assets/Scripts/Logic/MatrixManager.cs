@@ -45,6 +45,7 @@ public class MatrixManager : MonoBehaviour
         LogMatrix(gameMatrix);
     }
 
+    // only in single player
     public void PlaceOpponentBridge(int x, int y)
     {
         Vector3 position = CalculatePosition(x, y);

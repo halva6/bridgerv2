@@ -6,9 +6,6 @@ public class ResetMove : MonoBehaviour
 {
     private Stack<int[,]> matrixStack = new Stack<int[,]>();
     private Matrix matrix;
-
-    private bool isReset = false;
-
     void Awake()
     {
         matrix = gameObject.GetComponent<Matrix>();
@@ -25,8 +22,6 @@ public class ResetMove : MonoBehaviour
     {
         if (matrixStack.Count >= 2)
         {
-            isReset = true;
-
             // Entferne die letzten zwei Zustände
             matrixStack.Pop(); // letzter Zug
             int[,] previousMatrix = matrixStack.Pop(); // vorletzter Zug

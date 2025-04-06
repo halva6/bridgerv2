@@ -1310,8 +1310,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1280fc07522434aad9c06b903736d40b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  isMultiplayer: 1
-  simulationCount: 1000
+  isMultiplayer: 0
+  simulationCount: 5000
   initialPlayer: Green
 --- !u!114 &1055742628
 MonoBehaviour:

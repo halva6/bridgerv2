@@ -16,6 +16,7 @@ public class GameManager : MonoBehaviour
     private MatrixLogic matrixLogic;
 
     private string currentPlayer;
+    private bool isThinking = false;
 
     private void Start()
     {
@@ -78,6 +79,8 @@ public class GameManager : MonoBehaviour
     {
         matrixManager.CurrentPlayer = currentPlayer;
 
+        // Debug.Log($"[DEBUG] Thinking State {isThinking}");
+
         if (matrixManager.IsBridgePlaced)
         {
             SwitchPlayer("Green", "Computer");
@@ -88,7 +91,6 @@ public class GameManager : MonoBehaviour
         else if (currentPlayer.Equals("Computer"))
         {
             StartCoroutine(RunMCTSAsync(transformedMatrix));
-            CheckGameOver(transformedMatrix);
         }
     }
 
@@ -98,8 +100,11 @@ public class GameManager : MonoBehaviour
         yield return new WaitUntil(() => mctsTask.IsCompleted);
 
         (int row, int col) = mctsTask.Result;
-        Debug.Log($"Best Move: ({row}, {col})");
-        matrixManager.PlaceOpponentBridge(row, col);
+        Debug.Log($"Best Move: ({col}, {row})");
+        matrixManager.PlaceOpponentBridge(col, row);
+        CheckGameOver(transformedMatrix);
+        SwitchPlayer("Green", "Computer");
+
     }
 
     private void CheckGameOver(int[,] transformedMatrix)

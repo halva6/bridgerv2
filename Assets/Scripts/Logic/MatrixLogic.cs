@@ -70,7 +70,7 @@ public class MatrixLogic : MonoBehaviour
                         return true;
                     }
                 }
-            } 
+            }
         }
         return false;
     }
@@ -172,9 +172,9 @@ public class MatrixLogic : MonoBehaviour
         return differences;
     }
 
-    public (int, int) getBestMCTS(int[,] board, int simulationsNumber) 
+    public (int, int) getBestMCTS(int[,] board, int simulationsNumber)
     {
-        if (!checkWinner(board, 1) && !checkWinner(board, 2)) 
+        if (!checkWinner(board, 1) && !checkWinner(board, 2))
         {
             MCTS mCTS = new MCTS(board, 1);
             int[,] moveBoard = mCTS.BestMove(simulationsNumber);
@@ -187,15 +187,15 @@ public class MatrixLogic : MonoBehaviour
             }
         }
 
-        return (-1,-1);
+        return (-1, -1);
     }
 
     public async Task<(int, int)> getBestMCTSAsync(int[,] board, int simulationsNumber)
     {
         return await Task.Run(() =>
-        {
-            return getBestMCTS(board, simulationsNumber);
-        });
+                {
+                    return getBestMCTS(board, simulationsNumber);
+                });
     }
 }
 
@@ -274,14 +274,41 @@ public class MCTS
         return node;
     }
 
+
     public MCTSNode Expand(MCTSNode node)
     {
         var validMoves = GetValidMoves(node.State, Player);
-        var move = validMoves[node.Children.Count];
-        var newState = MakeMove(node.State, move, Player);
+
+        // Nur nicht bereits expandierte Moves wählen
+        var unexpandedMoves = validMoves
+            .Where(move => !node.Children.Any(child => AreStatesEqual(child.State, MakeMove(node.State, move, Player))))
+            .ToList();
+
+        if (unexpandedMoves.Count == 0)
+        {
+            return node; // Keine Erweiterung möglich
+        }
+
+        var moveToExpand = unexpandedMoves[0];
+        var newState = MakeMove(node.State, moveToExpand, Player);
         var childNode = new MCTSNode(newState, node);
         node.Children.Add(childNode);
         return childNode;
+    }
+
+
+    private bool AreStatesEqual(int[,] a, int[,] b)
+    {
+        if (a.GetLength(0) != b.GetLength(0) || a.GetLength(1) != b.GetLength(1)) return false;
+
+        for (int i = 0; i < a.GetLength(0); i++)
+        {
+            for (int j = 0; j < a.GetLength(1); j++)
+            {
+                if (a[i, j] != b[i, j]) return false;
+            }
+        }
+        return true;
     }
 
     public int Simulate(MCTSNode node)
@@ -294,7 +321,7 @@ public class MCTS
         {
             //Debug.Log("[DEBUG] Next Random: " + NextRandom(0, GetValidMoves(currentState, currentPlayer).Count) +  " int i: " + i);
             var move = GetValidMoves(currentState, currentPlayer)[random.Next(0, GetValidMoves(currentState, currentPlayer).Count)];
-            currentState = MakeMove(currentState, move, currentPlayer); 
+            currentState = MakeMove(currentState, move, currentPlayer);
             currentPlayer = 3 - currentPlayer;
             i++;
         }
