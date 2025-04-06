@@ -7,7 +7,9 @@ public class ResetMove : MonoBehaviour
     private Stack<int[,]> matrixStack = new Stack<int[,]>();
     private Matrix matrix;
 
-    void Start()
+    private bool isReset = false;
+
+    void Awake()
     {
         matrix = gameObject.GetComponent<Matrix>();
     }
@@ -18,47 +20,62 @@ public class ResetMove : MonoBehaviour
         matrixStack.Push(matrixCopy);
         Debug.Log("Matrix gespeichert. Stackgröße: " + matrixStack.Count);
     }
+
     public void Undo()
     {
-        if (matrixStack.Count > 0)
+        if (matrixStack.Count >= 2)
         {
-            int[,] popMatrix = matrixStack.Pop();
-            (int row, int col) = FindDifference(matrix.GetMatrix(), popMatrix);
-            GameObject toRemoveGameObject = GameObject.Find($"{row} {col}");
+            isReset = true;
 
-            Destroy(toRemoveGameObject);
-            Debug.Log($"Removed: {col};{row}");
+            // Entferne die letzten zwei Zustände
+            matrixStack.Pop(); // letzter Zug
+            int[,] previousMatrix = matrixStack.Pop(); // vorletzter Zug
 
-            matrix.SetMatrix(popMatrix);
-            Debug.Log("Matrix zurückgesetzt. Stackgröße: " + matrixStack.Count);
+            // Vergleiche den aktuellen Matrix-Zustand mit dem alten Zustand
+            List<(int row, int col)> differences = FindDifferences(matrix.GetMatrix(), previousMatrix);
+
+            foreach (var (row, col) in differences)
+            {
+                GameObject toRemove = GameObject.Find($"{col};{row}");
+                if (toRemove != null)
+                {
+                    Destroy(toRemove);
+                    Debug.Log($"Removed: {col};{row}");
+                }
+            }
+
+            matrix.SetMatrix(previousMatrix);
+            Debug.Log("Matrix zwei Schritte zurückgesetzt. Stackgröße: " + matrixStack.Count);
         }
         else
         {
-            Debug.Log("Keine vorherigen Zustände vorhanden.");
+            Debug.Log("Nicht genug Zustände zum Zurücksetzen vorhanden.");
         }
     }
 
-    private (int row, int col) FindDifference(int[,] matrix1, int[,] matrix2)
+    // Gibt alle Unterschiede zwischen zwei Matrizen zurück
+    private List<(int row, int col)> FindDifferences(int[,] matrix1, int[,] matrix2)
     {
+        List<(int row, int col)> differences = new List<(int, int)>();
         int rows = matrix1.GetLength(0);
         int cols = matrix1.GetLength(1);
 
-        // Iteriere durch die Matrizen und finde die erste unterschiedliche Position
         for (int row = 0; row < rows; row++)
         {
             for (int col = 0; col < cols; col++)
             {
                 if (matrix1[row, col] != matrix2[row, col])
                 {
-                    // Unterschied gefunden
-                    return (row, col);
+                    differences.Add((row, col));
                 }
             }
         }
 
-        // Keine Unterschiede gefunden
-        throw new Exception("Die Matrizen sind identisch.");
+        if (differences.Count == 0)
+        {
+            Debug.Log("Die Matrizen sind identisch.");
+        }
+
+        return differences;
     }
-
 }
-

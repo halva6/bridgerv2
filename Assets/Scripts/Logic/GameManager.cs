@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using UnityEngine;
 
@@ -66,7 +67,7 @@ public class GameManager : MonoBehaviour
 
         if (matrixManager.IsBridgePlaced)
         {
-            SwitchPlayer();
+            SwitchPlayer("Green", "Red");
             matrixManager.IsBridgePlaced = false;
             CheckGameOver(transformedMatrix);
 
@@ -79,7 +80,7 @@ public class GameManager : MonoBehaviour
 
         if (matrixManager.IsBridgePlaced)
         {
-            currentPlayer = currentPlayer.Equals("Green") ? "Computer" : "Green";
+            SwitchPlayer("Green", "Computer");
             matrixManager.IsBridgePlaced = false;
             CheckGameOver(transformedMatrix);
 
@@ -119,9 +120,9 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    private void SwitchPlayer()
+    private void SwitchPlayer(string player1, string player2)
     {
-        currentPlayer = currentPlayer.Equals("Green") ? "Red" : "Green";
+        currentPlayer = currentPlayer.Equals(player1) ? player2 : player1;
     }
 
     private int[,] TransformMatrixValues(int[,] matrix)
