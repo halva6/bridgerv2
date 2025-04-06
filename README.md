@@ -1,7 +1,3 @@
-Here's the translated README.md file:
-
----
-
 # bridgerv2  
 A cool logic game where you skillfully build bridges to win.
 
